@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IP 信息查询</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 480px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      color: #333;
+    }
+
+    .form-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      justify-content: center;
+    }
+
+    input {
+      flex: 1 1 60%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      min-width: 0;
+    }
+
+    button {
+      flex: 1 1 30%;
+      min-width: 80px;
+      padding: 0.6rem 1rem;
+      background: #007bff;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #result {
+      margin-top: 1rem;
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: Consolas, monospace;
+      white-space: pre-wrap;
+      color: #333;
+      min-height: 200px;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      input {
+        flex: 1 1 100%;
+      }
+
+      button {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>IP 信息查询</h1>
+
+  <div class="form-group">
+    <input type="text" id="ipInput" placeholder="输入 IP，留空查看当前 IP" />
+    <button id="queryBtn">查询</button>
+  </div>
+
+  <div id="result">等待查询...</div>
+</div>
+
+<script>
+  const apiBase = "https://ip-whois-service.onrender.com"; // 替换成你的服务地址
+
+  async function fetchIPInfo(ip) {
+    let url = apiBase + "/ip";
+    let options = {};
+
+    if (ip) {
+      options = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ip }),
+      };
+    }
+
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) throw new Error("请求失败：" + res.status);
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      return { error: err.message };
+    }
+  }
+
+  function displayResult(data) {
+    if (data.error) {
+      document.getElementById("result").textContent = "❌ 错误: " + data.error;
+      return;
+    }
+
+    const lines = [
+      `🌐 IP:        ${data.ip}`,
+      `📍 城市:      ${data.city}`,
+      `🗺️ 国家:      ${data.country}`,
+      `🕒 时区:      ${data.timezone}`,
+      `⏰ 当前时间:  ${data.time}`,
+      `📡 ISP:       ${data.isp}`,
+      `🏢 组织:      ${data.org}`,
+      `📶 ASN:       ${data.asn}`,
+      `🧭 纬度:      ${data.latitude}`,
+      `🧭 经度:      ${data.longitude}`,
+    ];
+
+    document.getElementById("result").textContent = lines.join("\n");
+  }
+
+  document.getElementById("queryBtn").addEventListener("click", async () => {
+    const ip = document.getElementById("ipInput").value.trim();
+    document.getElementById("result").textContent = "🔍 查询中...";
+    const data = await fetchIPInfo(ip);
+    displayResult(data);
+  });
+
+  window.addEventListener("load", async () => {
+    document.getElementById("result").textContent = "🌐 正在获取当前 IP 信息...";
+    const data = await fetchIPInfo("");
+    displayResult(data);
+  });
+</script>
+
+</body>
+</html>
