@@ -7,35 +7,36 @@
     * {
       box-sizing: border-box;
     }
+
     body {
       font-family: "Helvetica Neue", Arial, sans-serif;
       background-color: #f0f2f5;
       margin: 0;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+      padding: 40px 0;
     }
+
     .container {
       background-color: #fff;
       padding: 40px;
       border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       max-width: 700px;
-      width: 100%;
+      width: 90%;
+      margin: 0 auto;
       text-align: center;
     }
+
     h2 {
       margin-bottom: 20px;
       color: #333;
     }
+
     .input-group {
       display: flex;
       width: 100%;
-      max-width: 100%;
       margin: 0 auto;
     }
+
     input[type="text"] {
       flex: 1;
       padding: 10px;
@@ -44,6 +45,7 @@
       border-radius: 5px 0 0 5px;
       text-align: center;
     }
+
     button {
       padding: 10px 20px;
       font-size: 16px;
@@ -54,9 +56,11 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+
     button:hover {
       background-color: #0056b3;
     }
+
     #result {
       white-space: pre-wrap;
       background-color: #f9f9f9;
@@ -66,12 +70,9 @@
       margin-top: 20px;
       text-align: left;
       color: #333;
-      max-height: 400px;
-      overflow-y: auto;
-
-      /* 与上面 input-group 宽度保持一致 */
       width: 100%;
     }
+
     .error {
       color: red;
       font-weight: bold;
