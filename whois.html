@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>WHOIS 查询工具</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+    }
+    h2 { margin-bottom: 20px; color: #333; }
+    input[type="text"] {
+      width: 70%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover { background-color: #0056b3; }
+    #domainDisplay {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+    #result {
+      white-space: pre-wrap;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 5px;
+      margin-top: 20px;
+      text-align: left;
+      color: #333;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🌐 WHOIS 查询工具</h2>
+
+    <input type="text" id="queryInput" placeholder="请输入域名或 IP，例如：google.com">
+    <button onclick="performWhois()">查询</button>
+
+    <div id="domainDisplay"></div>
+    <div id="result">结果将在此显示...</div>
+  </div>
+
+  <script>
+    // 接口相关变量
+    const WHOIS_API_BASE = "https://ip-whois-service.onrender.com";
+    const WHOIS_API_PATH = "/whois";
+    const WHOIS_API_URL = `${WHOIS_API_BASE}${WHOIS_API_PATH}`;
+
+    let extractedDomain = null;
+
+    // 提取 WHOIS 信息中的域名
+    function extractDomainFromText(whoisText) {
+      const re = /Domain Name:\s*([^\s]+)/i;
+      const m = whoisText.match(re);
+      return m ? m[1] : null;
+    }
+
+    async function performWhois() {
+      const userInput = document.getElementById('queryInput').value.trim();
+      const resultDiv = document.getElementById('result');
+      const domainDisplay = document.getElementById('domainDisplay');
+
+      resultDiv.textContent = '';
+      domainDisplay.textContent = '';
+      extractedDomain = null;
+
+      if (!userInput) {
+        domainDisplay.innerHTML = '<span class="error">⚠️ 请输入一个域名或 IP 地址。</span>';
+        return;
+      }
+
+      resultDiv.textContent = '查询中，请稍候...';
+
+      try {
+        const response = await fetch(WHOIS_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ query: userInput })
+        });
+
+        if (!response.ok) {
+          throw new Error(`请求失败，状态码：${response.status}`);
+        }
+
+        const data = await response.json();
+        const rawResult = data.result || '';
+
+        extractedDomain = extractDomainFromText(rawResult);
+        if (extractedDomain) {
+          domainDisplay.innerHTML = `🔍 已提取域名：<strong>${extractedDomain}</strong>`;
+        } else {
+          domainDisplay.innerHTML = '⚠️ 未能从 WHOIS 信息中提取域名。';
+        }
+
+        resultDiv.textContent = rawResult;
+
+      } catch (err) {
+        resultDiv.innerHTML = `<span class="error">发生错误：${err.message}</span>`;
+      }
+    }
+
+    // 添加回车键监听
+    document.getElementById("queryInput").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        performWhois();
+      }
+    });
+  </script>
+
+</body>
+</html>

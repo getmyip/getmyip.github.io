@@ -140,11 +140,20 @@
     document.getElementById("result").textContent = lines.join("\n");
   }
 
-  document.getElementById("queryBtn").addEventListener("click", async () => {
+  document.getElementById("queryBtn").addEventListener("click", handleQueryClick);
+
+  async function handleQueryClick() {
     const ip = document.getElementById("ipInput").value.trim();
     document.getElementById("result").textContent = "🔍 查询中...";
     const data = await fetchIPInfo(ip);
     displayResult(data);
+  }
+
+  // 监听回车键执行查询
+  document.getElementById("ipInput").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      handleQueryClick();
+    }
   });
 
   // 页面加载时自动查询当前 IP
