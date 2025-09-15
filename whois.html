@@ -114,11 +114,11 @@
         }
 
         const data = await response.json();
-        const rawResult = data.result || '';
+        const rawResult = data.raw || '';
 
         domainDisplay.innerHTML = `
-          WHOIS 服务器：<strong>${data.whois_server || '无'}</strong><br/>
           查询域名：<strong>${data.query || '无'}</strong><br/>
+          WHOIS 服务器：<strong>${data.whois_server || '无'}</strong><br/>
         `;
 
         resultDiv.textContent = rawResult;
