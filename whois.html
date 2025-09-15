@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <title>WHOIS 查询工具</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: "Helvetica Neue", Arial, sans-serif;
       background-color: #f0f2f5;
@@ -24,13 +26,23 @@
       width: 100%;
       text-align: center;
     }
-    h2 { margin-bottom: 20px; color: #333; }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .input-group {
+      display: flex;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+    }
     input[type="text"] {
-      width: 70%;
+      flex: 1;
       padding: 10px;
       font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 5px 0 0 5px;
+      text-align: center;
     }
     button {
       padding: 10px 20px;
@@ -38,16 +50,12 @@
       background-color: #007BFF;
       color: white;
       border: none;
-      border-radius: 5px;
-      margin-left: 10px;
+      border-radius: 0 5px 5px 0;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    button:hover { background-color: #0056b3; }
-    #domainDisplay {
-      margin-top: 20px;
-      font-weight: bold;
-      color: #333;
+    button:hover {
+      background-color: #0056b3;
     }
     #result {
       white-space: pre-wrap;
@@ -60,6 +68,9 @@
       color: #333;
       max-height: 400px;
       overflow-y: auto;
+
+      /* 与上面 input-group 宽度保持一致 */
+      width: 100%;
     }
     .error {
       color: red;
@@ -72,29 +83,25 @@
   <div class="container">
     <h2>🌐 WHOIS 查询工具</h2>
 
-    <input type="text" id="queryInput" placeholder="请输入域名或 IP，例如：google.com">
-    <button onclick="performWhois()">查询</button>
+    <div class="input-group">
+      <input type="text" id="queryInput" placeholder="请输入域名或 IP，例如：google.com">
+      <button onclick="performWhois()">查询</button>
+    </div>
 
-    <div id="domainDisplay"></div>
     <div id="result">结果将在此显示...</div>
   </div>
 
   <script>
-    // 接口相关变量
-    const WHOIS_API_BASE = "https://ip-whois-service.onrender.com";
-    const WHOIS_API_PATH = "/whois";
-    const WHOIS_API_URL = `${WHOIS_API_BASE}${WHOIS_API_PATH}`;
+    const WHOIS_API_URL = "https://ip-whois-service.onrender.com/whois";
 
     async function performWhois() {
       const userInput = document.getElementById('queryInput').value.trim();
       const resultDiv = document.getElementById('result');
-      const domainDisplay = document.getElementById('domainDisplay');
 
       resultDiv.textContent = '';
-      domainDisplay.textContent = '';
 
       if (!userInput) {
-        domainDisplay.innerHTML = '<span class="error">⚠️ 请输入一个域名或 IP 地址。</span>';
+        resultDiv.innerHTML = '<span class="error">⚠️ 请输入一个域名或 IP 地址。</span>';
         return;
       }
 
@@ -114,13 +121,7 @@
         }
 
         const data = await response.json();
-        const rawResult = data.raw || '';
-
-        domainDisplay.innerHTML = `
-          查询域名：<strong>${data.query || '无'}</strong><br/>
-          WHOIS 服务器：<strong>${data.whois_server || '无'}</strong><br/>
-        `;
-
+        const rawResult = data.raw || '无结果返回。';
         resultDiv.textContent = rawResult;
 
       } catch (err) {
@@ -128,7 +129,6 @@
       }
     }
 
-    // 添加回车键监听
     document.getElementById("queryInput").addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
         performWhois();
